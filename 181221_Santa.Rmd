@@ -1,0 +1,157 @@
+---
+title: "Riddler ~ Dec 21, 2018"
+author: "mleary"
+date: "December 23, 2018"
+output: 
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+    toc_depth: 3
+    collapsed: FALSE
+    code_folding: hide
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(warning = FALSE)
+library(tidyverse)
+
+```
+
+# Riddler Express: Santa needs some help with math 
+
+URL: https://fivethirtyeight.com/features/santa-needs-some-help-with-math/
+
+Santa Claus is getting up there in age, and his memory has begun to falter. (After all, why do you think he keeps a list?) It’s gotten so bad that this year Santa forgot what order to put the reindeer in. Obviously, he remembers that Rudolph goes first because of the red organic light bulb in the middle of his face, but big guy just can’t remember what to do with the other eight.
+
+If he doesn’t get the right order, the aerodynamics of his sleigh will be all wrong and he won’t be able to get all of his deliveries done in time. Yes, Santa has Moneyballed Christmas Eve. Luckily, the reindeer know where they should each be, but since they’re just animals **they can only grunt in approval if they are put in the right spot.**
+
+Determined to get it right, Santa first **creates a list of the reindeer in some random order**. He then goes to the first position and harnesses each reindeer one by one, starting at the top of his list. **When a reindeer grunts, Santa leaves it in that correct position, moves onto the next position**, and works down that same list once again.
+
+**If harnessing a reindeer into any spot takes one minute, how long on average would it take Santa to get the correct reindeer placement?**
+
+Extra credit: Is there a strategy that Santa could use that does better?
+
+### Set up simulation
+
+* I started with just 100 trials to test my set up, then upped it to 1,000,000 once I proved it out.
+* I debated how to set this up - I needed to adjust the probabilty for the first (and subsequent positions) baseed on remaing reindeer.
+* I thnk this proves out and adjusts appropiately -
+
+```{r}
+
+sim <- crossing(trial = 1:1e6,
+               Position = 1:8) %>%
+        mutate(Attempts = case_when(
+                 rbinom(n(), 1, 1 / (9 - Position)) == 1 ~ 1,
+                 rbinom(n(), 1, 1 / (8 - Position)) == 1 ~ 2,
+                 rbinom(n(), 1, 1 / (7 - Position)) == 1 ~ 3,
+                 rbinom(n(), 1, 1 / (6 - Position)) == 1 ~ 4,
+                 rbinom(n(), 1, 1 / (5 - Position)) == 1 ~ 5,
+                 rbinom(n(), 1, 1 / (4 - Position)) == 1 ~ 6,
+                 rbinom(n(), 1, 1 / (3 - Position)) == 1 ~ 7,
+                 TRUE ~ 8) # This should only happen on first position
+               )
+```
+
+### Test Simulation
+
+* I visually checked and it made sense, but I wanted a quick sanity check.  There should never be more Attempts then  Reindeer_left.
+
+```{r}
+sim %>%
+  mutate(Reindeer_Left_Start = 9 - Position,
+         Test = Reindeer_Left_Start < Attempts) %>% 
+  summarise(sum(Test))
+
+
+```
+
+### Group by Trial for summary stats
+
+* Since it is one minute per attempt, I can use attempts = minutes. 
+
+```{r}
+sim %>% 
+  group_by(trial) %>% 
+  summarise(Total_Minutes = sum (Attempts)) %>% 
+  summarise(Min_Time = min(Total_Minutes),
+            Max_Time = max(Total_Minutes),
+            Median_Time = median(Total_Minutes),
+            Avg_Time = mean(Total_Minutes))
+
+```
+
+### Riddler Express Answer:
+  Approximately 22 minutes
+  
+### Extra Credit:
+
+Extra credit: Is there a strategy that Santa could use that does better?
+
+
+# Riddler Classic: Santa needs some help with math 
+
+From Steven Pratt, the best way to spread Christmas cheer is singing loud for all to hear:
+
+In Santa’s workshop, elves make toys during a shift each day. On the overhead radio, Christmas music plays, with a program **randomly selecting songs from a large playlist**.
+
+**During any given shift, the elves hear 100 songs**. A cranky elf named Cranky has taken to throwing snowballs at everyone **if he hears the same song twice**. This has happened during about half of the shifts. One day, a mathematically inclined elf named Mathy tires of Cranky’s sodden outbursts. So Mathy decides to use what he knows to figure out how large Santa’s playlist actually is.
+
+Help Mathy out: How large is Santa’s playlist?
+
+### Set up Simulation
+```{r}
+
+sim2 <- crossing(trial = 1:100,
+                 playlist = seq(from = 1000, to = 10000, by = 100),
+                 songs_played = 100) %>% 
+        rowwise() %>% 
+        mutate(times_same_song_played = sum(duplicated(
+                                            sample(playlist, 100, replace = TRUE))),
+               same_song_played = ifelse(times_same_song_played > 0, TRUE, FALSE)
+               )
+sim2
+```
+
+###Test Simluation & review results
+
+```{r}
+test.sim2 <- sim2 %>% 
+  group_by(playlist) %>% 
+  summarise(percent_times_same_song_played = scales::percent(sum(same_song_played) / max(trial))) 
+
+test.sim2
+```
+
+* This seems to make sense.  I am going to adjust my playlist length and rerun to narrow in on the 50% occurence of a repeated song, which appear to be near 7,000 range.
+
+### Adjustments to Simulation 
+```{r}
+sim3 <- crossing(trial = 1:100000,
+                 playlist = seq(from = 6500, to = 7500, by = 25),
+                 songs_played = 100) %>% 
+        rowwise() %>% 
+        mutate(times_same_song_played = sum(duplicated(
+                                            sample(playlist, 100, replace = TRUE))),
+               same_song_played = ifelse(times_same_song_played > 0, TRUE, FALSE)
+               )
+
+sim3 %>% 
+  group_by(playlist) %>% 
+  summarise(percent_times_same_song_played = sum(same_song_played) / max(trial))
+
+sim3 %>% 
+  group_by(playlist) %>% 
+  summarise(percent_times_same_song_played = sum(same_song_played) / max(trial)) %>% 
+  ggplot(aes(x = playlist, y = percent_times_same_song_played)) +
+  geom_line() +
+  geom_hline(yintercept = .5, color = "red") +
+  xlab('Songs on Playlist') +
+  ylab('Percent Change of a Repeat Song')
+
+```
+
+### Riddler Classic Answer:
+* Approximately 7,200 based on a quick review
+* I'm worried my logic was flawed on this one

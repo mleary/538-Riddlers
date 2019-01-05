@@ -1,0 +1,105 @@
+---
+title: "Riddler ~ Oct 26, 2018"
+author: "mleary"
+date: "January, 04 2019"
+output: 
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+    toc_depth: 3
+    collapsed: FALSE
+    code_folding: hide
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(warning = FALSE)
+library(tidyverse)
+
+```
+
+
+URL: https://fivethirtyeight.com/features/what-are-the-odds-youd-already-have-my-number/
+
+# Riddler Express: 
+My daughter recently noticed that the 10 digits of our old landline phone number are the same digits as those in my wife’s cell phone. The first three digits match exactly because we are in the same area code as before. And the last seven digits of my wife’s cell phone are an exact scrambled version of the last seven digits of the old landline. By “exact scramble,” I mean a string of numbers that is different than the original string of numbers but contains all of the same digits with the exact same number of repetitions (so, for example, if “4” appears exactly three times in the landline number, it also appears exactly three times in my wife’s cell number).
+
+My daughter asked, “What are the odds of that?”
+
+To make this concrete, assume that landlines and cell numbers in my area code are assigned randomly, such that a person is equally likely to get any of the 10,000,000 numbers between and including 000-0000 to 999-9999. Given that assumption, what is the probability that the last seven digits of the cell number are an exact scramble of the last seven digits of our landline?
+
+## Approach:
+
+Instead of solving this mathmatically, I am choosing to approach it as a simulation problem. It's a good oppurtunity to enhance my knowledge and understanding of R, work with the Tidyverse package, and focus on programming concepts and issues.
+
+## Create Simulation
+
+This took a while.  I tried several approachs but had issues due to the computational effort required.  I settled on a method where I created a vector of all the sorted phone number permutations (10,000,000 permutations as stated in the problem), and then conducted simulations off that vector.
+
+**Note:**  I created the for loop due to errors when running the apply anonymous function to the complete data frame.  Not sure if that issue was related to my PC's computing power or R limitations, so that was a good learnig point.
+
+```{r, eval = FALSE}
+
+total_scrambles <- c()
+
+for (num in 0:9) {
+    
+    numbers <-crossing(first_digit = num,
+                       second_digit = 0:9,
+                       third_digit = 0:9,
+                       fourth_digit = 0:9,
+                       fifth_digit = 0:9,
+                       sixth_digit = 0:9,
+                       seventh_digit = 0:9)
+    
+    numbers$ordered <- apply(numbers, 1, function(x) paste0(sort(x), collapse=''))
+    
+    total_scrambles <- c(total_scrambles, numbers$ordered)
+  
+    print(paste0("Round ", num, " Complete!"))
+}
+
+sim <- crossing(trials = 1:1000000) %>% 
+  rowwise() %>% 
+  mutate(person1 = sample(total_scrambles, 1) , 
+         person2 = sample(total_scrambles, 1) ,
+         same_scramble = ifelse(person1 == person2, TRUE, FALSE))
+
+ scales::percent(sum(sim$same_scramble) / nrow(sim))
+
+ length(unique(total_scrambles))
+
+```
+
+
+## Riddler Express Answer:
+
+**Note:** The code chunk above is set to eval = FALSE to prevent excessive knit times.
+
+There is a 0.018% chance.
+
+There are approximately 11,400 different distinct "scrambles" of the seven digt phone number.  Running a simulation you have the same scramble approximately 0.018 percent of the time.
+
+
+# Riddler Classic: 
+
+Today marks the beginning of Riddler Sports League. Sixteen teams, with strengths ranging from 1 to 16, will be taking part. Every team plays every other team once, with the schedule randomly determined at the start of the season. The games’ outcomes are decided probabilistically. **Take the strengths of the two competing teams, add them together and add an extra 1. That creates the denominators of three fractions that determine the chances of each outcome: win, loss or draw.**
+
+Here’s an example of how it works: **If Team A’s strength is 2 and Team B’s strength is 1, then Team A wins 2/4 of the time, loses 1/4 and draws 1/4.** Another example: If Team A’s strength is 15 and Team B’s strength is 14, then Team A wins 15/30 of the time, loses 14/30 and draws 1/30.
+
+**A win earns 2 points, a loss 0 points, and a draw 1 point** for each team. The title winner (or winners) is whoever has the most points at the end of the season.
+
+But — everybody in Riddler Nation is so busy solving puzzles that they don’t have time to play every game of the sports season, **so they’ll play only until a title winner is mathematically determined**. On opening day, every team plays its first game. Afterward, one specifically chosen game is played each day. Each chosen game must be the next scheduled game for at least one of the participating teams. Your challenge, as head of the Ministry of Sport, is to craft an algorithm that chooses the next game to play such that the median number of games across a thousand simulated seasons is as small as possible. What is that number? What is the theoretical fewest games it would take?
+
+Extra credit: Modify your code to model soccer’s Premier League and determine how many of its games are meaningless. (In that league, there are 20 teams that face each other twice, and a win is worth three points, a tie one point and a loss zero points. Also, the bottom three teams need to be mathematically determined for purposes of relegation.)
+
+
+### Riddler Classic Answer:
+
+```{r}
+
+
+```
+
+
+
