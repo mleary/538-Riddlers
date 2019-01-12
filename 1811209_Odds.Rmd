@@ -3,10 +3,8 @@ title: "Riddler ~ Oct 26, 2018"
 author: "mleary"
 date: "January, 04 2019"
 output: 
-  html_document:
-    toc: TRUE
-    toc_float: TRUE
-    toc_depth: 3
+  rmdformats::html_clean:
+    highlight: kate
     collapsed: FALSE
     code_folding: hide
 ---
@@ -22,21 +20,21 @@ library(tidyverse)
 URL: https://fivethirtyeight.com/features/what-are-the-odds-youd-already-have-my-number/
 
 # Riddler Express: 
-My daughter recently noticed that the 10 digits of our old landline phone number are the same digits as those in my wife’s cell phone. The first three digits match exactly because we are in the same area code as before. And the last seven digits of my wife’s cell phone are an exact scrambled version of the last seven digits of the old landline. By “exact scramble,” I mean a string of numbers that is different than the original string of numbers but contains all of the same digits with the exact same number of repetitions (so, for example, if “4” appears exactly three times in the landline number, it also appears exactly three times in my wife’s cell number).
+My daughter recently noticed that the 10 digits of our old land line phone number are the same digits as those in my wife’s cell phone. The first three digits match exactly because we are in the same area code as before. And the last seven digits of my wife’s cell phone are an exact scrambled version of the last seven digits of the old land line. By “exact scramble,” I mean a string of numbers that is different than the original string of numbers but contains all of the same digits with the exact same number of repetitions (so, for example, if “4” appears exactly three times in the land line number, it also appears exactly three times in my wife’s cell number).
 
 My daughter asked, “What are the odds of that?”
 
-To make this concrete, assume that landlines and cell numbers in my area code are assigned randomly, such that a person is equally likely to get any of the 10,000,000 numbers between and including 000-0000 to 999-9999. Given that assumption, what is the probability that the last seven digits of the cell number are an exact scramble of the last seven digits of our landline?
+To make this concrete, assume that landmines and cell numbers in my area code are assigned randomly, such that a person is equally likely to get any of the 10,000,000 numbers between and including 000-0000 to 999-9999. Given that assumption, what is the probability that the last seven digits of the cell number are an exact scramble of the last seven digits of our land line?
 
 ## Approach:
 
-Instead of solving this mathmatically, I am choosing to approach it as a simulation problem. It's a good oppurtunity to enhance my knowledge and understanding of R, work with the Tidyverse package, and focus on programming concepts and issues.
+Instead of solving this mathematically, I am choosing to approach it as a simulation problem. It's a good opportunity to enhance my knowledge and understanding of R, work with the Tidyverse package, and focus on programming concepts and issues.
 
 ## Create Simulation
 
-This took a while.  I tried several approachs but had issues due to the computational effort required.  I settled on a method where I created a vector of all the sorted phone number permutations (10,000,000 permutations as stated in the problem), and then conducted simulations off that vector.
+This took a while.  I tried several approaches but had issues due to the computational effort required.  I settled on a method where I created a vector of all the sorted phone number permutations (10,000,000 permutations as stated in the problem), and then conducted simulations off that vector.
 
-**Note:**  I created the for loop due to errors when running the apply anonymous function to the complete data frame.  Not sure if that issue was related to my PC's computing power or R limitations, so that was a good learnig point.
+**Note:**  I created the for loop due to errors when running the apply anonymous function to the complete data frame.  Not sure if that issue was related to my PC's computing power or R limitations, so that was a good learning point.
 
 ```{r, eval = FALSE}
 
@@ -78,7 +76,7 @@ sim <- crossing(trials = 1:1000000) %>%
 
 There is a 0.018% chance.
 
-There are approximately 11,400 different distinct "scrambles" of the seven digt phone number.  Running a simulation you have the same scramble approximately 0.018 percent of the time.
+There are approximately 11,400 different distinct "scrambles" of the seven digit phone number.  Running a simulation you have the same scramble approximately 0.018 percent of the time.
 
 
 # Riddler Classic: 
@@ -93,13 +91,201 @@ But — everybody in Riddler Nation is so busy solving puzzles that they don’t
 
 Extra credit: Modify your code to model soccer’s Premier League and determine how many of its games are meaningless. (In that league, there are 20 teams that face each other twice, and a win is worth three points, a tie one point and a loss zero points. Also, the bottom three teams need to be mathematically determined for purposes of relegation.)
 
+**NOTE:**
 
-### Riddler Classic Answer:
+I ended up using this as an opportunity to increase my knowledge  of python (i.e I hit some programming roadblocks and stopped trying to work on it by myself).  The Riddler had a solution developed by a reader, Richard Judge, who developed a python script to solve the problem.  I used his python script and used it as a guide to create a VERY similar solution in R.  His work can be found here: 
+
+[Artilce with Solution](https://www.linkedin.com/pulse/most-efficient-sports-schedule-richard-judge/)
+
+[Script on Github](https://github.com/RJudgeII/RiddlerSportsTeam/blob/master/RiddlerSports.py)
+
 
 ```{r}
 
+generate_first_day <- function(teams) {
+      first.day <- data.frame()
+      team.list <- teams
+      for (i in 1:(length(teams) / 2)) {
+            team2 <- sample(2:length(team.list), 1)
+            if(team2 == 1) {team2 <- 2}
+            match <- data.frame(team1 = team.list[1], team2 = team.list[team2])
+            first.day <- rbind(first.day, data.frame(team1 = team.list[1], team2 = team.list[team2])) 
+            team.list <- team.list[-team2] 
+            team.list <- team.list[-1]
+      }
+      return(first.day)
+}
+
+generate_schedule <- function(teams, first.day) {
+    schedule <- data.frame()
+      for (i in 1:(length(teams)-1)){
+        for (j in (i+1):length(teams)){
+          schedule <- rbind(schedule, data.frame(team1 = teams[i], team2 = teams[j]))
+        }
+      }
+     schedule <-  setdiff(schedule, first.day) 
+     rows <- sample(nrow(schedule))
+     schedule <- schedule[rows, ]
+     
+    return(schedule)
+}
+
+update_first_day <- function(team1, team2){
+    total_games <<- total_games + 8
+    team.data$games.played[team1] <<- team.data$games.played[team1] + 1
+    team.data$games.played[team2] <<- team.data$games.played[team2] + 1
+}
+
+match_result <- function(team1, team2){
+    denom <- team1 + team2 + 1
+    outcome <- sample(1:denom, 1)
+    winner <- ifelse(outcome <= team1, team1,
+                     ifelse(outcome <= (team1 + team2), team2,
+                            0))
+    
+    return(winner)
+}
+
+update_team_data <- function(team1, team2, teams, team.data ){
+    
+    #Update games played
+    team.data$games.played[team1] <- team.data$games.played[team1] + 1
+    team.data$games.played[team2] <- team.data$games.played[team2] + 1
+    
+    #find ouutcome
+    outcome <- match_result(team1, team2)
+    
+    
+    #Update points
+    if (outcome == 0) {
+          team.data$points[team1] <- team.data$points[team1] + 1
+          team.data$points[team2] <- team.data$points[team2] + 1
+    } else if (outcome == team1) {
+          team.data$points[team1] <- team.data$points[team1] + 2
+    } else {
+          team.data$points[team2] <- team.data$points[team2] + 2
+    }
+    
+    #Update Possible Points
+    team.data$possible.points[team1] <- team.data$points[team1] + 
+                                        ((length(teams) - 1) - team.data$games.played[team1]) * 2
+    team.data$possible.points[team2] <- team.data$points[team2] + 
+                                        ((length(teams) - 1) - team.data$games.played[team2]) * 2
+    return(team.data)
+}  
+
+rank_team <- function(team.data) {
+    team.data <- team.data %>% 
+    mutate(rank = dense_rank(desc(points)))
+}
+
+determine_winner <- function(team.data) {
+    winner <- FALSE
+    leader_current_points <- max(team.data$points)
+    contender_possible_points <- sort(team.data$possible.points, decreasing = T)[2]
+    
+    if(leader_current_points > contender_possible_points){
+      winner <- TRUE
+    }
+    
+    if(sort(team.data$games.played, decreasing = TRUE)[2] == 15){
+      tied_second_points <- unique(sort(team.data$possible.points, decreasing = T))[2]
+        if(leader_current_points > tied_second_points){
+           winner <- TRUE
+        }
+    }
+    
+    return(winner)
+}
+
+determine_next_team <- function(team.data){
+    possible_teams <- team.data$team[team.data$games.played < 15 &
+                                     team.data$possible.points == max(team.data$possible.points)]
+                                     
+    next_team <- sort(possible_teams, decreasing = TRUE)[1]
+    
+    return(next_team)
+  
+}
+
+determine_next_match <- function(team, schedule) {
+    col1 <- match(team, schedule$team1)
+    col2 <- match(team, schedule$team2)
+    row <- ifelse(is.na(col1), col2,
+                  ifelse(is.na(col2), col1,
+                         ifelse(col1<col2, col1, col2)))
+    next_match <- schedule[row, ]
+    
+    return(next_match) 
+}
+
+update_schedule <- function(next_match, schedule){
+  
+    schedule <- setdiff(schedule, next_match)
+    
+    return(schedule)
+}
+      
+main <- function() {
+  games_to_winner <- c()
+  
+  for (game in 1:1000) {
+      total_games <- 0
+      teams <- 1:16
+      team.data <- crossing(team = 1:16,
+                            games.played = 0, 
+                            possible.points  = 30,
+                            points = 0,
+                            rank = 1)
+      first.day <-  generate_first_day(teams = teams)
+      schedule <- generate_schedule(teams = teams, first.day = first.day)
+      
+      #Update after 1st day (8 matches)
+      for (i in 1:(length(teams) / 2)){
+          team.data <- update_team_data(team1 = first.day$team1[i], 
+                        team2 = first.day$team2[i],
+                        teams = teams,
+                        team.data = team.data)
+      }
+      
+      total_games <- sum(team.data$games.played / 2)
+      team.data <- rank_team(team.data)
+      
+      winner <- determine_winner(team.data) 
+      
+      while(winner == FALSE & total_games <120) {
+          next_team <- determine_next_team(team.data)
+          next_match <- determine_next_match(next_team, schedule)
+          schedule <- update_schedule(next_match, schedule)
+          team.data <- update_team_data(next_match$team1, next_match$team2, teams,team.data)
+          total_games <- sum(team.data$games.played / 2)
+          winner <- determine_winner(team.data)
+      }
+      
+      games_played <- ifelse(winner == FALSE, NA, total_games)
+      games_to_winner <- append(games_to_winner, games_played)
+  }
+  
+  answer_median <- median(games_to_winner, na.rm = T)
+  answer_mean <- mean(games_to_winner, na.rm = T)
+  answer_min <- min(games_to_winner, na.rm = T)
+  answer_max <- max(games_to_winner, na.rm = T)
+
+  print(paste0("Median number of games until winner is ", answer_median))
+  print(paste0("Mean number of games until winner is ", answer_mean))
+  print(paste0("Minimum number of games until winner is ", answer_min))
+  print(paste0("Maximum number of games until winner is ", answer_max))
+  barplot(games_to_winner,
+          xlab = "games",
+          ylab = "count")
+
+}
+
+main() 
 
 ```
 
 
+### Riddler Classic Answer:
 
+Approximately games 68 games.  The theoretically smallest number of matches is 22 games, where 8 matches are played the first week and one team goes on to win 14 straight matches.  They would have 30 points and no team could top that since the first placed team would have beaten every team.
