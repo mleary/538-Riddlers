@@ -32,19 +32,27 @@ For example, the number 81 on that display would not fit this criterion — if t
 
 Identify all numbers that can't be turned upside down:
 
-ambiguous    : 0, 1, 2, 5, 6, 8, 9
-not ambiguous: 3, 4,  7
+same if flipped = 0, 1, 2, 5, 8 
+
+opposites - 6, 9
+
+not ambiguous: 3, 4, 7
 
 Than, simply create all two digit combinations and mark them as not_ambiguous if either one or both of the digits is not ambiguous.
 ```{r, eval = FALSE}
-
+#  Numbers that can't be turned upside down
 not_ambiguous <- c(3,4,7)
+
+#These are not ambiguous since they are the same # upside down
+one_offs <- c(00, 11, 22, 55, 88, 69, 96)
 
 combos <- crossing(digit_1 = 0:9,
                    digit_2 = 0:9) %>% 
-  mutate(not_ambiguous_indicator = if_else(digit_1 %in% not_ambiguous, TRUE, 
-                                           ifelse(digit_2 %in% not_ambiguous,TRUE, FALSE)))
-
+  mutate(combined = as.numeric(paste0(digit_1, digit_2)),
+          not_ambiguous_indicator = if_else(digit_1 %in% not_ambiguous, TRUE, 
+                                           ifelse(digit_2 %in% not_ambiguous,TRUE, 
+                                                  ifelse(combined %in% one_offs, TRUE,  FALSE))))
+total
 sum(combos$not_ambiguous_indicator)
 
 ```
@@ -52,5 +60,5 @@ sum(combos$not_ambiguous_indicator)
 
 ## Riddler Express Answer:
 
-51 combinations
+58 combinations
 
