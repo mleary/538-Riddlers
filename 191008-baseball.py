@@ -3,7 +3,6 @@ author: matt leary
 date: October 2, 2019
 link: https://fivethirtyeight.com/features/which-baseball-team-will-win-the-riddler-fall-classic/
 """
-
 import numpy as np
 
 '''
@@ -18,6 +17,7 @@ def simulate_game():
     result = np.random.choice(2, 1)
     return result
 
+
 def generate_8_games():
     gameResults = np.array([])
     for games in range(8):
@@ -25,11 +25,13 @@ def generate_8_games():
         gameResults = np.append(gameResults, gameOutcome)
     return gameResults
 
+
 def check_results(iterationarray):
     first_4_games = np.sum(iterationarray[0:3]) == 2
     all_games = np.sum(iterationarray) == 4
-    result = first_4_games + all_games == True
+    result = first_4_games == True & all_games == True
     return result
+
 
 def record_overall_results():
     finalResults = np.array([])
@@ -45,5 +47,3 @@ def record_overall_results():
 What is the result?
 '''
 record_overall_results()
-
-
