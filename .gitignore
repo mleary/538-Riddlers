@@ -1,2 +1,53 @@
+########################
+#   Project Specific   #
+########################
 *.html
 .Rproj.user
+.DS_Store
+
+########################
+#          R           #
+########################
+
+# Scratch Files #
+#################
+scratch.R
+scratch.Rmd
+
+# Checkpoint folder #
+#####################
+.checkpoint/
+
+# History files #
+#################
+.Rhistory
+.Rapp.history
+
+# User-specific files #
+#######################
+.Ruserdata
+
+# Output files from R CMD build #
+#################################
+/*.tar.gz
+
+# RStudio files #
+#################
+.Rproj.user/
+
+# OAuth2 token, see https://github.com/hadley/httr/releases/tag/v0.3 #
+######################################################################
+.httr-oauth
+
+# Temporary files created by R markdown #
+#########################################
+*.utf8.md
+*.knit.md
+
+########################
+#        Python        #
+########################
+
+# Scratch Files #
+#################
+scratch.py
