@@ -1,0 +1,104 @@
+---
+title: "Riddler ~ Jan 24, 2020"
+author: "mleary"
+date: "February, 21 2020"
+output: 
+  rmdformats::html_clean:
+    highlight: kate
+    collapsed: FALSE
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(warning = FALSE)
+knitr::opts_chunk$set(message = FALSE)
+```
+
+
+URL: https://fivethirtyeight.com/features/can-you-flip-your-way-to-victory/
+
+# Riddler Express: 
+
+On a warm, sunny day, Nick glanced at a thermometer, and noticed something quite interesting. When he toggled between the Fahrenheit and Celsius scales, the digits of the temperature — when rounded to the nearest degree — had switched. For example, this works for a temperature of 61 degrees Fahrenheit, which corresponds to a temperature of 16 degrees Celsius.
+
+However, the temperature that day was not 61 degrees Fahrenheit. What was the temperature?
+
+## Approach:
+### Setup
+
+For this one I wanted to solve the problem in both R & Python, so I decided to use the reticulate package.
+
+```{r}
+#Setup
+library(reticulate)
+reticulate::use_python('/Library/Frameworks/Python.framework/Versions/3.8/bin/python3')
+
+```
+
+### R Solution
+
+This was fun...
+
+```{r}
+library(tidyverse)
+library(stringi)
+
+# helper function to convert fahrenheit to celsius
+# formula for conversion -- (2°C × 9/5) + 32 = 35.6°F
+celsius_to_fahrenheit_round <- function(temp.celsius){
+  temp.fahrenheit <-  (temp.celsius * (9/5)) + 32
+  temp.fahrenheit <- round(temp.fahrenheit, digits = 0)
+  return(temp.fahrenheit)
+}
+
+# create table
+answer <-  tibble(temp.c = 1:100) %>% 
+ mutate(temp.f = celsius_to_fahrenheit_round(temp.c),
+        temp.c = as.character(temp.c),
+        temp.f = as.character(temp.f),
+        temp.f.switched = stringi::stri_reverse(temp.f)) %>% 
+   filter(temp.c == temp.f.switched) %>% 
+   filter(temp.c != 16) # filter out the record already mentioned
+ 
+```
+
+R answer is `r answer$temp.c` degres celsius or `r answer$temp.f` degrees fahrenheit.
+
+### Python Solution
+
+This wasn't the most elegant solution...
+
+```{python}
+#Setup
+import pandas as pd
+# helper function to convert fahrenheit to celsius
+# formula for conversion -- (2°C × 9/5) + 32 = 35.6°F
+def celsius_to_fahrenheit_round(tempcelsius):
+    tempfahrenheit = (tempcelsius * (9/5)) + 32
+    tempfahrenheit = round(tempfahrenheit )
+    return tempfahrenheit
+
+# helper function to reverse an integer
+def revese_temp(temp):
+    temp = str(temp)
+    temp = list(temp)
+    temp.reverse()
+    temp = "".join(temp)
+    temp = int(temp)
+    return temp
+
+tempC = pd.Series(range(1,101))
+tempF = celsius_to_fahrenheit_round(tempC).astype(int)
+
+tempDF = pd.DataFrame({"tempC":tempC, "tempF":tempF})
+
+tempDF['tempFrev'] = tempDF.tempF.apply(revese_temp)
+
+tempDF[tempDF.tempC == tempDF.tempFrev]
+
+```
+
+## Riddler Express Answer:
+28 degrees celcius or 82 degress fahrenheit
+
+
