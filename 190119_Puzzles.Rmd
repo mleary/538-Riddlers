@@ -1,10 +1,12 @@
 ---
-title: "Riddler ~ Jan 18, 2019"
-author: "mleary"
+title: "Like numbers on a clock"
+author: "Matt Leary"
 date: "January, 18 2019"
 output: 
-  rmdformats::html_clean:
-    highlight: kate
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+    toc_depth: 3
     collapsed: FALSE
     code_folding: hide
 ---

@@ -1,10 +1,12 @@
 ---
-title: "Riddler ~ Oct 26, 2018"
-author: "mleary"
-date: "January, 04 2019"
+title: "What are the odds you'd already have my number?"
+author: "Matt Leary"
+date: "November, 09 2018"
 output: 
-  rmdformats::html_clean:
-    highlight: kate
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+    toc_depth: 3
     collapsed: FALSE
     code_folding: hide
 ---
