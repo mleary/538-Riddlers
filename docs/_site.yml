@@ -1,0 +1,13 @@
+name: "Riddler website"
+output_dir: "."
+navbar:
+  title: "538 Riddlers"
+  left:
+    - text: "Home"
+      href: index.html
+    - text: "Riddlers"
+      href: content.html
+    - text: "by Matt Leary"
+      href: https://www.mattleary.com/resume/
+    - icon: fa-github fa-lg
+      href: https://github.com/mleary/538-Riddlers
