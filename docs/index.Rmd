@@ -4,6 +4,12 @@ title: "538 Riddlers"
 
 Hi! I've enjoyed improving my coding skills in R and Python by solving Riddler Puzzlers from [FiveThirtyEight](fivethirtyeight.com). Working through the problems helps with functional programming, creating smaller helper functions to speed analysis, and creating simulations.
 
-Granted, many of these could be solved via simple math equations, but the process has helped me explore different packages & functions in the `{tidyverse}`.
+Granted, many of these could be solved via simple math equations, but the process has helped me explore different packages & functions in the `{tidyverse}`, such as:
+
+* `{purrr}` for functional programming
+* `{dplyr}` & `{tidyr}` for data manipulation and prep
+* `{reticulate}` for incorporating & exploring python
+* `{stringr}` & `{stringi}` for string manipulation
+
 
 A secondary goal of this is exploring ways to create websites with R, `{rmarkdown}` and github pages.  YAML files, index files, etc., are not my bailiwick but its useful things to understand. 

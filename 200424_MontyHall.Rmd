@@ -1,11 +1,14 @@
 ---
-title: "Riddler ~ Apr 24, 2020"
+title: "Monty Hall reimagined"
 author: "mleary"
-date: "February, 21 2020"
+date: "May 10, 2020"
 output: 
-  rmdformats::html_clean:
-    highlight: kate
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+    toc_depth: 3
     collapsed: FALSE
+    code_folding: hide
 ---
 
 ```{r setup, include=FALSE}

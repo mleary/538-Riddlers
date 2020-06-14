@@ -1,10 +1,12 @@
 ---
-title: "Riddler ~ Feb 7, 2020"
-author: "mleary"
+title: "Madam I am Adam."
+author: "Matt Leary"
 date: "February, 15 2020"
 output: 
-  rmdformats::html_clean:
-    highlight: kate
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+    toc_depth: 3
     collapsed: FALSE
     code_folding: hide
 ---
@@ -13,6 +15,9 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_chunk$set(warning = FALSE)
 
+#Setup
+library(tidyverse)
+library(stringi)
 ```
 
 
@@ -28,9 +33,7 @@ If we write out dates in the American format of MM/DD/YYYY (i.e., the two digits
 ## Approach:
 
 ```{r}
-#Setup
-library(tidyverse)
-library(stringi)
+
 
 ### Create string of numbers 1 to 9 (for leading zeros)
 leading.zero.nums <- c("01", "02" , "03" , '04', '05', '06', '07', '08', '09')
