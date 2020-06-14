@@ -1,6 +1,6 @@
 ---
-title: "Riddler ~ Jan 24, 2020"
-author: "mleary"
+title: "Temperature, nature's mystery"
+author: "Matt Leary"
 date: "February, 21 2020"
 output: 
   rmdformats::html_clean:
@@ -33,6 +33,8 @@ For this one I wanted to solve the problem in both R & Python, so I decided to u
 library(reticulate)
 reticulate::use_python('/Library/Frameworks/Python.framework/Versions/3.8/bin/python3')
 
+reticulate::virtualenv_create("r-reticulate")
+reticulate::virtualenv_install("r-reticulate", "pandas")
 ```
 
 ### R Solution
