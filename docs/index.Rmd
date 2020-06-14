@@ -13,3 +13,7 @@ Granted, many of these could be solved via simple math equations, but the proces
 
 
 A secondary goal of this is exploring ways to create websites with R, `{rmarkdown}` and github pages.  YAML files, index files, etc., are not my bailiwick but its useful things to understand. 
+<br><br>
+<center>
+![](./img/home.png){width="400px"}
+</center>
