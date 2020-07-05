@@ -1,0 +1,209 @@
+---
+title: "Connect the dots"
+author: "Matt Leary"
+date: "June 27, 2020"
+output: 
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+    toc_depth: 3
+    collapsed: FALSE
+    code_folding: show
+    theme: flatly
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(warning = FALSE)
+knitr::opts_chunk$set(message = FALSE)
+```
+
+
+URL: https://fivethirtyeight.com/features/can-you-connect-the-dots/
+
+# Riddler Express: 
+
+In Riddler City, the city streets follow a grid layout, running north-south and east-west. You’re driving north when you decide to play a little game. Every time you reach an intersection, you randomly turn left or right, each with a 50 percent chance.
+
+After driving through 10 intersections, what is the probability that you are still driving north?
+
+Extra credit: Now suppose that at every intersection, there’s a one-third chance you turn left, a one-third chance you turn right and a one-third chance you drive straight. After driving through 10 intersections, now what’s the probability that you are still driving north?And what are your chances of winning the prize?
+
+## Approach:
+
+Well for the first question, 50% change of driving north. Given an even number of turns, you must be facing South or North in even numbers. 
+
+### Setup
+
+Lets generate some helper functions.  I figure I need to create random turns based on the available diretions and then repeat the process 10 times.
+
+```{r}
+library(dplyr)
+options(stringsAsFactors = FALSE)
+
+# Generate valid turn options
+# Requires a character argument
+# returns a character vector
+turn_options <- function(direction){
+  
+  if(!direction %in% c("North", "East", "South", "West")){
+    message("Invalid Direction.  Try 'North', 'South', 'East' or 'West'")
+  } else {
+  if(direction == "North"){options <- c("West", "North", "East")}
+  if(direction == "East"){options <- c("North", "East", "South")}
+  if(direction == "South"){options <- c("East", "South", "West")}
+  if(direction == "West"){options <- c("South", "West", "North")}
+  return(options)
+  }
+
+}
+
+# Take a direction and  make a random turn
+# Requires a character input
+# Returns a character (direction you are heading)
+turn_random <- function(direction) {
+
+  turn.options <- turn_options(direction)
+  result <- sample(turn.options, 1)
+  return(result)
+    
+}
+
+# Randomly turn ten times and see where you end up
+# Dont love while loop, but hey its quick
+turn_10_times <- function(initial.direction = "North"){
+  
+  turn.result <- turn_random(initial.direction)
+  count <- 1
+  while(count < 10){
+    turn.result <- turn_random(turn.result)
+    count <- count + 1
+  }
+  return(turn.result)
+}
+```
+
+Now that we have some helpers, lets generate some simulations.  First, we'll start by simply generating results
+```{r}
+trial.count <- 100000
+
+sim <- tibble::tibble(
+  trial = 1:trial.count,
+  outcome = base::replicate(trial.count, turn_10_times())
+) 
+
+sim$outcome %>% janitor::tabyl() %>% janitor::adorn_pct_formatting()
+
+result <- sim %>% 
+  summarise(chance.north = sum(ifelse(outcome == "North", 1, 0)) / n())
+```
+
+Looks like there is a `r result$chance.north`% chance of still heading north.
+
+# Plot Paths
+
+For fun, I wanted to go one step further and visualize the path the car could take.
+
+## New Helper Functions
+
+```{r}
+
+turn_10_times_path <- function(initial.direction = "North"){
+  path <- tibble::tibble(
+    start  = "start",  
+    turn1  = turn_random(initial.direction),
+    turn2  = turn_random(turn1),
+    turn3  = turn_random(turn2),
+    turn4  = turn_random(turn3),
+    turn5  = turn_random(turn4),
+    turn6  = turn_random(turn5),
+    turn7  = turn_random(turn6),
+    turn8  = turn_random(turn7),
+    turn9  = turn_random(turn8),
+    turn10 = turn_random(turn9),
+  ) %>% 
+    t() %>% 
+    # unname() %>% 
+    as.data.frame() %>%
+    tibble::rownames_to_column() %>% 
+    setNames(c("Turn", "Path")) 
+  return(path)
+}
+
+add_x_coords <- function(dataset, num.turns){
+  result.vector <- c(0)
+  x <- 0
+  for(row in 2:num.turns){
+    direction <- dataset$Path[row]
+    if(direction == "East"){x <- x + 1}
+    if(direction == "West"){x <- x - 1}
+    result.vector <- append(result.vector, x)
+  }
+  dataset <- dataset %>% 
+    mutate(x = result.vector)
+  return(dataset)
+}
+
+add_y_coords <- function(dataset, num.turns){
+  result.vector <- c(0)
+  y <- 0
+  for(row in 2:num.turns){
+    direction <- dataset$Path[row]
+    if(direction == "North"){y <- y + 1}
+    if(direction == "South"){y <- y - 1}
+    result.vector <- append(result.vector, y)
+  }
+  dataset <- dataset %>% 
+    mutate(y = result.vector)
+  return(dataset)
+}
+
+generate_one_scenario <- function(number.turns = 10, trial.input = 1){
+  dat <- turn_10_times_path() %>% 
+    add_x_coords(num.turns = number.turns+1) %>% 
+    add_y_coords(num.turns = number.turns+1) %>% 
+    mutate(trial = trial.input) %>% 
+    select(trial, everything())
+  return(dat)
+}
+
+generate_many_trials <- function(trial.count) {
+  df.out <- generate_one_scenario()
+  trial <- 1
+  for(trials in 1:(trial.count-1)){
+    trial <- trial + 1
+    result.df <- generate_one_scenario(trial.input = trial)
+    df.out <- rbind(df.out, result.df)
+  }
+  return(df.out)
+}
+```
+
+```{r}
+
+library(ggplot2)
+
+trial.count <- 100
+sim <- generate_many_trials(trial.count)
+
+sim %>% 
+  ggplot(aes(x, y, group = trial, color = trial)) + 
+  geom_path(alpha= 0.2) +
+  geom_point(aes(x,y), 
+             data = sim %>% 
+               filter(Turn == "turn10") %>% 
+               add_count(x,y),
+             alpha = 0.2,
+             color="red") +
+  geom_point(aes(x = 0, y =0), color = "darkgreen", size = 4.5) +
+  theme_minimal() +
+  xlim(-10, 10) +
+  ylim(-10, 10) +
+  labs(title = "Path taken for each trial",
+       subtitle = "Green dot represents starting point, red dots ending point."
+       ) +
+  theme(legend.position = "none") 
+  
+```
+
+
