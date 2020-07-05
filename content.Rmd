@@ -11,17 +11,20 @@ Hopefully the overlap of those two things continue to increase.
 
 ## 2018
 
-- [What are the odds?](./content/181120_Odds.html)
+- [What are the odds?](./content/181120_Odds.html){target="_blank"}
 
-- [Santa needs some help](./content/181221_Santa.html)
+
+- [Santa needs some help](./content/181221_Santa.html){target="_blank"}
 
 
 ## 2019
 
-- [Like numbers on a clock](./content/190119_Puzzles.html)
+- [Like numbers on a clock](./content/190119_Puzzles.html){target="_blank"}
 
 ## 2020
 
-- [Madam I am Adam](./content/200215_palindromes.html)
+- [Madam I am Adam](./content/200215_palindromes.html){target="_blank"}
 
-- [Monty Hall reimagined](./content/200424_MontyHall.html)
+- [Monty Hall reimagined](./content/200424_MontyHall.html){target="_blank"}
+
+- [Random  turns](./content/20200627_Random_Turns.html){target="_blank"}

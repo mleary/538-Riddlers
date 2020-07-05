@@ -1,6 +1,6 @@
 ---
 title: "Connect the dots"
-author: "mleary"
+author: "Matt Leary"
 date: "June 27, 2020"
 output: 
   html_document:
@@ -9,6 +9,7 @@ output:
     toc_depth: 3
     collapsed: FALSE
     code_folding: show
+    theme: flatly
 ---
 
 ```{r setup, include=FALSE}
@@ -205,11 +206,4 @@ sim %>%
   
 ```
 
-
-### Delete
-```{r}
-
-sim %>% 
-
-```
 

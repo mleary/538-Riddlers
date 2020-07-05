@@ -9,6 +9,7 @@ output:
     toc_depth: 3
     collapsed: FALSE
     code_folding: show
+    theme: flatly
 ---
 
 ```{r setup, include=FALSE}
