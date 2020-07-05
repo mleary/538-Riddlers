@@ -6,7 +6,7 @@ navbar:
     - text: "Home"
       href: index.html
     - text: "Riddlers"
-      href: content.html
+      href:  content.html
     - text: "Session Info"
       href: sessioninfo.html
     - icon: fa-github fa-lg
@@ -15,4 +15,4 @@ output:
   html_document:
     theme: flatly
     include:
-      after_body: footer.html
+      after_body: styles/footer.html
